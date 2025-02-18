@@ -1,3 +1,3 @@
 # Marmaid-def
 
-common define for Marmaid
+common define for Mar's maid space
