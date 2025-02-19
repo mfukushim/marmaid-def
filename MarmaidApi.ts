@@ -276,12 +276,18 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
     .addSuccess(Schema.Struct({
         status: Schema.NonEmptyTrimmedString,
         answer: Schema.String,
-        targetName: Schema.String,
-        targetId: Schema.String,
+        targetName: Schema.UndefinedOr(Schema.String),
+        targetId: Schema.UndefinedOr(Schema.String),
       }
     ))
     .addError(GenericError, {status: 500})
-    .setPayload(Schema.Struct({targets: Schema.Array(Schema.NonEmptyTrimmedString)}))
+    .setPayload(Schema.Struct({
+      userId: Schema.NonEmptyTrimmedString,
+      targets: Schema.Array(Schema.NonEmptyTrimmedString),
+      lat: Schema.NumberFromString,
+      lng: Schema.NumberFromString,
+      bearing: Schema.NumberFromString
+    }))
   )
   // .add(HttpApiEndpoint.post("viewInfo", "/view-info")
   //     .addSuccess(ViewInfoSchema)
