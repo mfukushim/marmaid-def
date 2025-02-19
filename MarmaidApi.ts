@@ -99,13 +99,13 @@ const CamPosSchema = Schema.Literal(
   'none',
   'front',
   'upper',
-  'bottom',
+  'lower',
   'left',
   'right',
   'upper right',
   'upper left',
-  'bottom right',
-  'bottom left')
+  'lower right',
+  'lower left')
 
 export type CamPos = typeof CamPosSchema.Type
 // 'front'
