@@ -108,6 +108,15 @@ const CamPosSchema = Schema.Literal(
   'lower left')
 
 export type CamPos = typeof CamPosSchema.Type
+
+const LocStatusSchema = Schema.Literal(
+  'error',
+  'exist',
+  'notFound',
+  )
+
+export type LocStatus = typeof LocStatusSchema.Type
+
 // 'front'
 // | 'upper'
 // | 'bottom'
@@ -274,7 +283,7 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
   )
   .add(HttpApiEndpoint.post("checkTarget", "/check-target")
     .addSuccess(Schema.Struct({
-        status: Schema.NonEmptyTrimmedString,
+        status: LocStatusSchema,
         answer: Schema.String,
         targetName: Schema.UndefinedOr(Schema.String),
         targetId: Schema.UndefinedOr(Schema.String),
@@ -288,6 +297,22 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       lng: Schema.NumberFromString,
       bearing: Schema.NumberFromString
     }))
+  )
+    .add(HttpApiEndpoint.post("moveToTarget", "/move-to-target")
+      .addSuccess(Schema.Struct({
+          status: LocStatusSchema,
+          answer: Schema.String,
+        }
+      ))
+      .addError(GenericError, {status: 500})
+      .setPayload(Schema.Struct({
+        userId: Schema.NonEmptyTrimmedString,
+        lat: Schema.NumberFromString,
+        lng: Schema.NumberFromString,
+        bearing: Schema.NumberFromString,
+        trgetId: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
+        targets: Schema.UndefinedOr(Schema.Array(Schema.NonEmptyTrimmedString)),
+      }))
   )
   // .add(HttpApiEndpoint.post("viewInfo", "/view-info")
   //     .addSuccess(ViewInfoSchema)
