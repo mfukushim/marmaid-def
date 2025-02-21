@@ -307,9 +307,9 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       .addError(GenericError, {status: 500})
       .setPayload(Schema.Struct({
         userId: Schema.NonEmptyTrimmedString,
-        lat: Schema.NumberFromString,
-        lng: Schema.NumberFromString,
-        bearing: Schema.NumberFromString,
+        lat: Schema.Number,
+        lng: Schema.Number,
+        bearing: Schema.Number,
         trgetId: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
         targets: Schema.UndefinedOr(Schema.Array(Schema.NonEmptyTrimmedString)),
       }))
