@@ -293,9 +293,9 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
     .setPayload(Schema.Struct({
       userId: Schema.NonEmptyTrimmedString,
       targets: Schema.Array(Schema.NonEmptyTrimmedString),
-      lat: Schema.NumberFromString,
-      lng: Schema.NumberFromString,
-      bearing: Schema.NumberFromString
+      lat: Schema.Number,
+      lng: Schema.Number,
+      bearing: Schema.Number
     }))
   )
     .add(HttpApiEndpoint.post("moveToTarget", "/move-to-target")
