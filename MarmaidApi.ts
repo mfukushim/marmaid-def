@@ -302,6 +302,13 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       .addSuccess(Schema.Struct({
           status: LocStatusSchema,
           answer: Schema.String,
+          loc: Schema.UndefinedOr(Schema.Struct(
+            {
+              lat: Schema.Number,
+              lng: Schema.Number,
+              bearing: Schema.Number,
+            } 
+          ))
         }
       ))
       .addError(GenericError, {status: 500})
