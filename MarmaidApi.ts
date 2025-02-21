@@ -311,7 +311,7 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
         lng: Schema.Number,
         bearing: Schema.Number,
         proceed: Schema.Number,
-        trgetId: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
+        targetId: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
         targets: Schema.UndefinedOr(Schema.Array(Schema.NonEmptyTrimmedString)),
       }))
   )
