@@ -81,7 +81,7 @@ export const NearbyParamSchema = Schema.Struct({
   // maxResultCount: Schema.Number,
   // languageCode: Schema.String,
   latitude: Schema.Number,  //  緯度での近似
-  longitude: Schema.Number, //  
+  longitude: Schema.Number, //
   bearing: Schema.Number, //  北=0,東=90
   radius: Schema.Number,  //  m単位
   // locationRestriction: Schema.Struct({
@@ -110,22 +110,19 @@ const CamPosSchema = Schema.Literal(
 export type CamPos = typeof CamPosSchema.Type
 
 const LocStatusSchema = Schema.Literal(
-  'error',
-  'exist',
-  'notFound',
-  )
+    'error',
+    'exist',
+    'notFound',
+)
+const MoveStatusSchema = Schema.Literal(
+    'error',
+    'moved',
+    'notMoved',
+    'notFound',
+)
 
 export type LocStatus = typeof LocStatusSchema.Type
-
-// 'front'
-// | 'upper'
-// | 'bottom'
-// | 'left'
-// | 'right'
-// | 'upper right'
-// | 'upper left'
-// | 'bottom right'
-// | 'bottom left';
+export type MoveStatus = typeof MoveStatusSchema.Type
 
 export class ExistenceSchema extends Schema.Class<ExistenceSchema>("ExistenceSchema")({
   id: Schema.String,
@@ -300,14 +297,14 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
   )
     .add(HttpApiEndpoint.post("moveToTarget", "/move-to-target")
       .addSuccess(Schema.Struct({
-          status: LocStatusSchema,
+          status: MoveStatusSchema,
           answer: Schema.String,
           loc: Schema.UndefinedOr(Schema.Struct(
             {
               lat: Schema.Number,
               lng: Schema.Number,
               bearing: Schema.Number,
-            } 
+            }
           ))
         }
       ))
