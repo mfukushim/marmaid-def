@@ -81,7 +81,7 @@ export const NearbyParamSchema = Schema.Struct({
   // maxResultCount: Schema.Number,
   // languageCode: Schema.String,
   latitude: Schema.Number,  //  緯度での近似
-  longitude: Schema.Number, //  
+  longitude: Schema.Number, //
   bearing: Schema.Number, //  北=0,東=90
   radius: Schema.Number,  //  m単位
   // locationRestriction: Schema.Struct({
