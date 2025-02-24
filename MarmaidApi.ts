@@ -120,9 +120,18 @@ const MoveStatusSchema = Schema.Literal(
     'notMoved',
     'notFound',
 )
+const AddRemoveStatusSchema = Schema.Literal(
+    'error',
+    'added',
+    'removed',
+    'notAdded',
+    'notRemoved',
+    'notFound',
+)
 
 export type LocStatus = typeof LocStatusSchema.Type
 export type MoveStatus = typeof MoveStatusSchema.Type
+export type AddRemoveStatus = typeof AddRemoveStatusSchema.Type
 
 export class ExistenceSchema extends Schema.Class<ExistenceSchema>("ExistenceSchema")({
   id: Schema.String,
@@ -296,34 +305,70 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
     }))
   )
     .add(HttpApiEndpoint.post("moveToTarget", "/move-to-target")
-      .addSuccess(Schema.Struct({
-          status: MoveStatusSchema,
-          answer: Schema.String,
-          loc: Schema.UndefinedOr(Schema.Struct(
-            {
-              lat: Schema.Number,
-              lng: Schema.Number,
-              bearing: Schema.Number,
+        .addSuccess(Schema.Struct({
+              status: MoveStatusSchema,
+              answer: Schema.String,
+              loc: Schema.UndefinedOr(Schema.Struct(
+                  {
+                    lat: Schema.Number,
+                    lng: Schema.Number,
+                    bearing: Schema.Number,
+                  }
+              ))
             }
-          ))
-        }
-      ))
-      .addError(GenericError, {status: 500})
-      .setPayload(Schema.Struct({
-        userId: Schema.NonEmptyTrimmedString,
-        lat: Schema.Number,
-        lng: Schema.Number,
-        bearing: Schema.Number,
-        proceed: Schema.Number,
-        targetId: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
-        targets: Schema.UndefinedOr(Schema.Array(Schema.NonEmptyTrimmedString)),
-      }))
-  )
-  // .add(HttpApiEndpoint.post("viewInfo", "/view-info")
-  //     .addSuccess(ViewInfoSchema)
-  //     .addError(GenericError, { status: 500 })
-  //     .setPayload(NearbyParam)
-  // )
+        ))
+        .addError(GenericError, {status: 500})
+        .setPayload(Schema.Struct({
+          userId: Schema.NonEmptyTrimmedString,
+          lat: Schema.Number,
+          lng: Schema.Number,
+          bearing: Schema.Number,
+          proceed: Schema.Number,
+          targetId: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
+          targets: Schema.UndefinedOr(Schema.Array(Schema.NonEmptyTrimmedString)),
+        }))
+    )
+    .add(HttpApiEndpoint.post("addObject", "/add-object")
+        .addSuccess(Schema.Struct({
+              status: MoveStatusSchema,
+              answer: Schema.String,
+              loc: Schema.UndefinedOr(Schema.Struct(
+                  {
+                    lat: Schema.Number,
+                    lng: Schema.Number,
+                    bearing: Schema.Number,
+                  }
+              ))
+            }
+        ))
+        .addError(GenericError, {status: 500})
+        .setPayload(Schema.Struct({
+          userId: Schema.NonEmptyTrimmedString,
+          lat: Schema.Number,
+          lng: Schema.Number,
+          bearing: Schema.Number,
+          typeName: Schema.NonEmptyTrimmedString,
+          uniqueName: Schema.OptionFromUndefinedOr(Schema.NonEmptyTrimmedString),
+          desc: Schema.OptionFromUndefinedOr(Schema.NonEmptyTrimmedString),
+          expirationEpoch: Schema.OptionFromUndefinedOr(Schema.Number),
+        }))
+    )
+    .add(HttpApiEndpoint.post("removeObject", "/remove-object")
+        .addSuccess(Schema.Struct({
+              status: AddRemoveStatusSchema,
+              answer: Schema.String,
+            }
+        ))
+        .addError(GenericError, {status: 500})
+        .setPayload(Schema.Struct({
+          userId: Schema.NonEmptyTrimmedString,
+          lat: Schema.Number,
+          lng: Schema.Number,
+          bearing: Schema.Number,
+          targetId: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
+          targets: Schema.UndefinedOr(Schema.Array(Schema.NonEmptyTrimmedString)),
+        }))
+    )
 {
 }
 
