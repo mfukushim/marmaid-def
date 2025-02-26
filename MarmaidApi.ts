@@ -138,7 +138,7 @@ export class ExistenceSchema extends Schema.Class<ExistenceSchema>("ExistenceSch
   typeName: Schema.String,
   uniqueName: Schema.UndefinedOr(Schema.String),
   parentRegionId: Schema.UndefinedOr(Schema.String),
-  isObject: Schema.Boolean,
+  hasObject: Schema.Boolean,
   desc: Schema.String,
   dist: Schema.Number,
   camPos: CamPosSchema, //  カメラビュー文言相対位置
@@ -155,6 +155,7 @@ export class NearbyParam extends Schema.Class<NearbyParam>("NearbyParam")({
 }) {
 }
 
+/*
 export const RegionInfoSchema = Schema.Struct({
   id: Schema.String,
   parentRegionId: Schema.Option(Schema.String),
@@ -189,17 +190,38 @@ export const ObjectInfoSchema = Schema.Struct({
   })),
   // pos: Schema.Array(Schema.Number),
 })
+*/
+
+export const ObjRegionInfoSchema = Schema.Struct({
+  id: Schema.String,
+  typeName: Schema.String,
+  uniqueName: Schema.Option(Schema.String),
+  parentRegionId: Schema.Option(Schema.String),
+  hasObject:Schema.Boolean,
+  desc: Schema.String,
+  //  locationかoffsetで指定 offsetの場合はparentRegionIdが必須
+  location: Schema.Option(Schema.Struct({
+    lat: Schema.Number,
+    lng: Schema.Number,
+  })),
+  offset: Schema.Option(Schema.Struct({
+    x: Schema.Number,
+    y: Schema.Number,
+  })),
+  radius: Schema.Option(Schema.Number),
+  frontAngle:Schema.Option(Schema.Number),
+})
 
 export interface CameraCoordinateExistenceInfo {
-  target: typeof RegionInfoSchema.Type | typeof ObjectInfoSchema.Type;
+  target: typeof ObjRegionInfoSchema.Type | typeof ObjRegionInfoSchema.Type;
   pos2D: Point;
   pos3D: Vec3,
 }
 
 export const MarmaidTextSearchSchema = Schema.Struct({
   places: MapDef.GmPlacesSchema,
-  regions: Schema.UndefinedOr(Schema.Array(RegionInfoSchema)),
-  objects: Schema.UndefinedOr(Schema.Array(ObjectInfoSchema)),
+  // regions: Schema.UndefinedOr(Schema.Array(ObjRegionInfoSchema)),
+  objects: Schema.UndefinedOr(Schema.Array(ObjRegionInfoSchema)),
 })
 
 
