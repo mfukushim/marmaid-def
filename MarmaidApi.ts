@@ -354,13 +354,13 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
     .addSuccess(Schema.Struct({
         status: AddRemoveStatusSchema,
         answer: Schema.String,
-        loc: Schema.UndefinedOr(Schema.Struct(
-          {
-            lat: Schema.Number,
-            lng: Schema.Number,
-            bearing: Schema.Number,
-          }
-        )),
+        // loc: Schema.UndefinedOr(Schema.Struct(
+        //   {
+        //     lat: Schema.Number,
+        //     lng: Schema.Number,
+        //     bearing: Schema.Number,
+        //   }
+        // )),
         objectId: Schema.UndefinedOr(Schema.String),
         regionId: Schema.UndefinedOr(Schema.String),
       }
