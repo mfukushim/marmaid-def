@@ -38,19 +38,6 @@ export class GenericError extends Schema.TaggedError<GenericError>()("GenericErr
 }) {
 }
 
-export class ViewInfoSchema extends Schema.TaggedError<ViewInfoSchema>()('ViewInfoSchema', {
-  status: Schema.NonEmptyTrimmedString,
-  objs: Schema.Array(Schema.Struct({
-    name: Schema.String,
-    //  TODO 補助情報がいるか?
-  })),
-  regions: Schema.Array(Schema.Struct({
-    name: Schema.String,
-    //  TODO 補助情報がいるか?
-  }))
-}) {
-}
-
 export class SearchNearParam extends Schema.Class<SearchNearParam>("SearchNearParam")({
   maxResultCount: Schema.Number,
   languageCode: Schema.String,
@@ -107,6 +94,18 @@ const CamPosSchema = Schema.Literal(
   'lower right',
   'lower left')
 
+const CamDistSchema = Schema.Literal(
+  'none',
+  'front',
+  'upper',
+  'lower',
+  'left',
+  'right',
+  'upper right',
+  'upper left',
+  'lower right',
+  'lower left')
+
 export type CamPos = typeof CamPosSchema.Type
 
 const LocStatusSchema = Schema.Literal(
@@ -144,6 +143,18 @@ export class ExistenceSchema extends Schema.Class<ExistenceSchema>("ExistenceSch
   camPos: CamPosSchema, //  カメラビュー文言相対位置
   pos2d: Schema.Array(Schema.Number), //  カメラ座標上面2d位置
   pos3d: Schema.Array(Schema.Number), //  カメラ座標系3d位置
+}) {
+}
+
+export class ViewInfoSchema extends Schema.Class<ViewInfoSchema>("ViewInfoSchema")({
+  id: Schema.String,
+  typeName: Schema.String,
+  uniqueName: Schema.UndefinedOr(Schema.String),
+  hasObject: Schema.Boolean,
+  desc: Schema.String,
+  dist: Schema.Number,
+  camPos: CamPosSchema, //  カメラビュー文言相対位置
+  camDist: CamDistSchema, //  カメラビュー文言相対位置
 }) {
 }
 
@@ -197,7 +208,7 @@ export const ObjRegionInfoSchema = Schema.Struct({
   typeName: Schema.String,
   uniqueName: Schema.Option(Schema.String),
   parentRegionId: Schema.Option(Schema.String),
-  hasObject:Schema.Boolean,
+  hasObject: Schema.Boolean,
   desc: Schema.String,
   //  locationかoffsetで指定 offsetの場合はparentRegionIdが必須
   location: Schema.Option(Schema.Struct({
@@ -209,7 +220,7 @@ export const ObjRegionInfoSchema = Schema.Struct({
     y: Schema.Number,
   })),
   radius: Schema.Option(Schema.Number),
-  frontAngle:Schema.Option(Schema.Number),
+  frontAngle: Schema.Option(Schema.Number),
 })
 
 export interface CameraCoordinateExistenceInfo {
@@ -299,6 +310,21 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
     .addSuccess(Schema.Struct({
         status: Schema.NonEmptyTrimmedString,
         points: Schema.Array(ExistenceSchema),
+      }
+    ))
+    .addError(GenericError, {status: 500})
+    .setUrlParams(Schema.Struct({
+      userId: Schema.NonEmptyTrimmedString,
+      lat: Schema.NumberFromString,
+      lng: Schema.NumberFromString,
+      bearing: Schema.NumberFromString
+    }))
+  )
+  .add(HttpApiEndpoint.get("viewInfo", "/view-info")
+    .addSuccess(Schema.Struct({
+        status: Schema.NonEmptyTrimmedString,
+        regionDesc: Schema.String,
+        regions: Schema.Array(ViewInfoSchema),
       }
     ))
     .addError(GenericError, {status: 500})
