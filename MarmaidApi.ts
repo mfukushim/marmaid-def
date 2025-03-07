@@ -95,18 +95,15 @@ const CamPosSchema = Schema.Literal(
   'lower left')
 
 const CamDistSchema = Schema.Literal(
-  'none',
-  'front',
-  'upper',
-  'lower',
-  'left',
-  'right',
-  'upper right',
-  'upper left',
-  'lower right',
-  'lower left')
+  '',
+  'very close',
+  'close',
+  'in distance',
+  'in very far away',
+)
 
 export type CamPos = typeof CamPosSchema.Type
+export type CamDist = typeof CamDistSchema.Type
 
 const LocStatusSchema = Schema.Literal(
   'error',
