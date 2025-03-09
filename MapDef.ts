@@ -1,4 +1,4 @@
-/*! map-traveler-mcp | MIT License | https://github.com/mfukushim/map-traveler-mcp */
+/*! map-space-mcp | MIT License | https://github.com/mfukushim/map-space-mcp */
 
 import { Schema } from "effect"
 
