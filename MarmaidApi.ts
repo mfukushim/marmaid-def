@@ -395,10 +395,12 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       lng: Schema.Number,
       bearing: Schema.Number,
       typeName: Schema.NonEmptyTrimmedString,
-      uniqueName: Schema.OptionFromUndefinedOr(Schema.NonEmptyTrimmedString),
+      uniqueName: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
       desc: Schema.NonEmptyTrimmedString,
-      radius: Schema.OptionFromUndefinedOr(Schema.Number),
-      expirationEpoch: Schema.OptionFromUndefinedOr(Schema.Number),
+      radius: Schema.UndefinedOr(Schema.Number),
+      nearbyTargetId:Schema.UndefinedOr(Schema.String),
+      nearbyTargets:Schema.Array(Schema.String),
+      expirationEpoch: Schema.UndefinedOr(Schema.Number),
     }))
   )
   .add(HttpApiEndpoint.post("removeObject", "/remove-object")
