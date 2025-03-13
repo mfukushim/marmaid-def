@@ -401,6 +401,7 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       nearbyTargetId:Schema.UndefinedOr(Schema.String),
       nearbyTargets:Schema.Array(Schema.String),
       expirationEpoch: Schema.UndefinedOr(Schema.Number),
+      position: Schema.UndefinedOr(Schema.String),
     }))
   )
   .add(HttpApiEndpoint.post("removeObject", "/remove-object")
