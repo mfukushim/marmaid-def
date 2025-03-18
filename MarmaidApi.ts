@@ -11,16 +11,6 @@ export type Point = [number, number];
 export const MapId = Schema.Number.pipe(Schema.brand("MapId"))
 export type MapId = typeof MapId.Type
 
-export const MapIdFromString = Schema.NumberFromString.pipe(
-  Schema.compose(MapId)
-)
-
-export class Map extends Schema.Class<Map>("Map")({
-  id: MapId,
-  text: Schema.NonEmptyTrimmedString,
-  done: Schema.Boolean
-}) {
-}
 
 class TimezoneSchema extends Schema.Class<TimezoneSchema>("TimezoneSchema")({
   status: Schema.NonEmptyTrimmedString,
@@ -71,15 +61,6 @@ export const NearbyParamSchema = Schema.Struct({
   longitude: Schema.Number, //
   bearing: Schema.Number, //  北=0,東=90
   radius: Schema.Number,  //  m単位
-  // locationRestriction: Schema.Struct({
-  //   circle: Schema.Struct({
-  //     center: Schema.Struct({
-  //       latitude: Schema.Number,
-  //       longitude: Schema.Number
-  //     }),
-  //     radius: Schema.Number,
-  //   })
-  // })
 })
 
 const CamPosSchema = Schema.Literal(
@@ -150,12 +131,13 @@ export class ViewInfoSchema extends Schema.Class<ViewInfoSchema>("ViewInfoSchema
   hasObject: Schema.Boolean,
   desc: Schema.String,
   dist: Schema.Number,
+  radius: Schema.Number,
   camPos: CamPosSchema, //  カメラビュー文言相対位置
   camDist: CamDistSchema, //  カメラビュー文言相対位置
 }) {
 }
 
-// export const ExistenceSchemaArray = Schema.Array(ExistenceSchema)
+export type ViewInfo = typeof ViewInfoSchema.Type
 
 export class NearbyParam extends Schema.Class<NearbyParam>("NearbyParam")({
   userId: Schema.String,
@@ -163,42 +145,6 @@ export class NearbyParam extends Schema.Class<NearbyParam>("NearbyParam")({
 }) {
 }
 
-/*
-export const RegionInfoSchema = Schema.Struct({
-  id: Schema.String,
-  parentRegionId: Schema.Option(Schema.String),
-  typeName: Schema.String,
-  uniqueName: Schema.Option(Schema.String),
-  desc: Schema.String,
-  dist: Schema.Number,
-  //  locationかoffsetで指定 offsetの場合はparentRegionIdが必須
-  location: Schema.Option(Schema.Struct({
-    latitude: Schema.Number,
-    longitude: Schema.Number,
-  })),
-  offset: Schema.Option(Schema.Struct({
-    x: Schema.Number,
-    y: Schema.Number,
-  })),
-  radius: Schema.Number,
-  // radius: Schema.Array(Schema.Number),
-  // camRangePos:Schema.Array(Schema.Array(Schema.Number)),
-})
-
-export const ObjectInfoSchema = Schema.Struct({
-  id: Schema.String,
-  typeName: Schema.String,
-  uniqueName: Schema.Option(Schema.String),
-  parentRegionId: Schema.String,  //  すべてのオブジェクトはRegionの子 単一物体でもregion-objectの対となる
-  desc: Schema.String,
-  offset: Schema.Option(Schema.Struct({ //  オブジェクトはregionとの相対位置を持つが、なくてもよい(所属することが示されているだけでも画像生成はできなければならない)
-    x: Schema.Number,
-    y: Schema.Number,
-    z: Schema.Number,
-  })),
-  // pos: Schema.Array(Schema.Number),
-})
-*/
 
 export const ObjRegionInfoSchema = Schema.Struct({
   id: Schema.String,
