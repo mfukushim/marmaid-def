@@ -118,6 +118,7 @@ export class ExistenceSchema extends Schema.Class<ExistenceSchema>("ExistenceSch
   hasObject: Schema.Boolean,
   desc: Schema.String,
   dist: Schema.Number,
+  radius: Schema.Number,
   camPos: CamPosSchema, //  カメラビュー文言相対位置
   pos2d: Schema.Array(Schema.Number), //  カメラ座標上面2d位置
   pos3d: Schema.Array(Schema.Number), //  カメラ座標系3d位置
@@ -136,8 +137,6 @@ export class ViewInfoSchema extends Schema.Class<ViewInfoSchema>("ViewInfoSchema
   camDist: CamDistSchema, //  カメラビュー文言相対位置
 }) {
 }
-
-export type ViewInfo = typeof ViewInfoSchema.Type
 
 export class NearbyParam extends Schema.Class<NearbyParam>("NearbyParam")({
   userId: Schema.String,
@@ -268,6 +267,7 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
         status: Schema.NonEmptyTrimmedString,
         regionDesc: Schema.String,
         regions: Schema.Array(ViewInfoSchema),
+        objects: Schema.Array(ViewInfoSchema),
       }
     ))
     .addError(GenericError, {status: 500})
@@ -344,8 +344,8 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       uniqueName: Schema.UndefinedOr(Schema.String),
       desc: Schema.NonEmptyTrimmedString,
       radius: Schema.UndefinedOr(Schema.Number),
-      nearbyTargetId:Schema.UndefinedOr(Schema.String),
-      nearbyTargets:Schema.Array(Schema.String),
+      nearbyTargetId: Schema.UndefinedOr(Schema.String),
+      nearbyTargets: Schema.Array(Schema.String),
       expirationEpoch: Schema.UndefinedOr(Schema.Number),
       position: Schema.UndefinedOr(Schema.String),
     }))
