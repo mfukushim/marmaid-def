@@ -35,8 +35,8 @@ export class SearchNearParam extends Schema.Class<SearchNearParam>("SearchNearPa
     circle: Schema.Struct({
       radius: Schema.Number,
       center: Schema.Struct({
-        latitude: Schema.Number,
-        longitude: Schema.Number
+        lat: Schema.Number,
+        lng: Schema.Number
       })
     })
   })
@@ -54,14 +54,16 @@ export class StreetViewParam extends Schema.Class<StreetViewParam>("StreetViewPa
 }) {
 }
 
-export const NearbyParamSchema = Schema.Struct({
+export class LocationParam extends Schema.Class<NearbyParam>("NearbyParam")({
   // maxResultCount: Schema.Number,
   // languageCode: Schema.String,
-  latitude: Schema.Number,  //  緯度での近似
-  longitude: Schema.Number, //
+  lat: Schema.Number,  //  緯度での近似
+  lng: Schema.Number, //
   bearing: Schema.Number, //  北=0,東=90
   radius: Schema.Number,  //  m単位
-})
+}) {
+
+}
 
 const CamPosSchema = Schema.Literal(
   'none',
@@ -140,7 +142,7 @@ export class ViewInfoSchema extends Schema.Class<ViewInfoSchema>("ViewInfoSchema
 
 export class NearbyParam extends Schema.Class<NearbyParam>("NearbyParam")({
   userId: Schema.String,
-  nearLocation: NearbyParamSchema,
+  nearLocation: LocationParam,
 }) {
 }
 
@@ -268,6 +270,25 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
         regionDesc: Schema.String,
         regions: Schema.Array(ViewInfoSchema),
         objects: Schema.Array(ViewInfoSchema),
+      }
+    ))
+    .addError(GenericError, {status: 500})
+    .setUrlParams(Schema.Struct({
+      userId: Schema.NonEmptyTrimmedString,
+      lat: Schema.NumberFromString,
+      lng: Schema.NumberFromString,
+      bearing: Schema.NumberFromString
+    }))
+  )
+  .add(HttpApiEndpoint.get("regionMap", "/region-map")
+    .addSuccess(Schema.Struct({
+        status: Schema.NonEmptyTrimmedString,
+        lat: Schema.Number,
+        lng: Schema.Number,
+        bearing: Schema.Number,
+        regionDesc: Schema.String,
+        excludeRegions: Schema.Array(ViewInfoSchema),
+        reachableObjects: Schema.Array(ViewInfoSchema),
       }
     ))
     .addError(GenericError, {status: 500})

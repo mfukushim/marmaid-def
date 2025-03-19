@@ -15,8 +15,8 @@ export class MapDef {
     types: Schema.OptionFromUndefinedOr(Schema.Array(Schema.String)),
     formattedAddress: Schema.String,
     location: Schema.Struct({
-      latitude: Schema.Number,
-      longitude: Schema.Number,
+      lat: Schema.Number,
+      lng: Schema.Number,
     }),
     displayName: Schema.Struct({
       text: Schema.String,
