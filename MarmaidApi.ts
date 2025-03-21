@@ -103,6 +103,7 @@ const AddRemoveStatusSchema = Schema.Literal(
   'error',
   'added',
   'removed',
+  'changed',
   'notAdded',
   'notRemoved',
   'notFound',
@@ -385,7 +386,25 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       bearing: Schema.Number,
       targetId: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
       targets: Schema.UndefinedOr(Schema.Array(Schema.NonEmptyTrimmedString)),
-    }))
+    })))
+    .add(HttpApiEndpoint.post("changeObject", "/change-object")
+      .addSuccess(Schema.Struct({
+          status: AddRemoveStatusSchema,
+          answer: Schema.String,
+        }
+      ))
+      .addError(GenericError, {status: 500})
+      .setPayload(Schema.Struct({
+        userId: Schema.NonEmptyTrimmedString,
+        lat: Schema.Number,
+        lng: Schema.Number,
+        bearing: Schema.Number,
+        targetId: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
+        targets: Schema.UndefinedOr(Schema.Array(Schema.NonEmptyTrimmedString)),
+        desc: Schema.String,
+        typeName: Schema.UndefinedOr(Schema.String),
+        uniqueName: Schema.UndefinedOr(Schema.String),
+      }))
   ) {
 }
 
