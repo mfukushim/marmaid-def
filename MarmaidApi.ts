@@ -310,12 +310,12 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
     ))
     .addError(GenericError, {status: 500})
     .setPayload(Schema.Struct({
-      userId: Schema.NonEmptyTrimmedString,
+      userId: Schema.String,
       targets: Schema.Array(Schema.NonEmptyTrimmedString),
       lat: Schema.Number,
       lng: Schema.Number,
       bearing: Schema.Number
-    }))
+    }).annotations({examples:[{userId:"1",targets:["living"],lat:30,lng:130,bearing:0}]}))
   )
   .add(HttpApiEndpoint.post("moveToTarget", "/move-to-target")
     .addSuccess(Schema.Struct({
@@ -339,7 +339,7 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       proceed: Schema.Number,
       targetId: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
       targets: Schema.UndefinedOr(Schema.Array(Schema.NonEmptyTrimmedString)),
-    }))
+    }).annotations({examples:[{userId:"1",proceed:1,targetId:undefined,targets:["living"],lat:30,lng:130,bearing:0}]}))
   )
   .add(HttpApiEndpoint.post("addObject", "/add-object")
     .addSuccess(Schema.Struct({
