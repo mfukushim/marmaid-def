@@ -279,7 +279,7 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       lat: Schema.NumberFromString,
       lng: Schema.NumberFromString,
       bearing: Schema.NumberFromString
-    }))
+    }).annotations({examples:[{userId:"1",lat:30,lng:130,bearing:0}]}))
   )
   .add(HttpApiEndpoint.get("regionMap", "/region-map")
     .addSuccess(Schema.Struct({
@@ -298,7 +298,7 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       lat: Schema.NumberFromString,
       lng: Schema.NumberFromString,
       bearing: Schema.NumberFromString
-    }))
+    }).annotations({examples:[{userId:"1",lat:30,lng:130,bearing:0}]}))
   )
   .add(HttpApiEndpoint.post("checkTarget", "/check-target")
     .addSuccess(Schema.Struct({
