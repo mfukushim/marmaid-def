@@ -151,21 +151,21 @@ export class NearbyParam extends Schema.Class<NearbyParam>("NearbyParam")({
 export const ObjRegionInfoSchema = Schema.Struct({
   id: Schema.String,
   typeName: Schema.String,
-  uniqueName: Schema.Option(Schema.String),
-  parentRegionId: Schema.Option(Schema.String),
+  uniqueName: Schema.UndefinedOr(Schema.String),
+  parentRegionId: Schema.UndefinedOr(Schema.String),
   hasObject: Schema.Boolean,
   desc: Schema.String,
   //  locationかoffsetで指定 offsetの場合はparentRegionIdが必須
-  location: Schema.Option(Schema.Struct({
+  location: Schema.UndefinedOr(Schema.Struct({
     lat: Schema.Number,
     lng: Schema.Number,
   })),
-  offset: Schema.Option(Schema.Struct({
+  offset: Schema.UndefinedOr(Schema.Struct({
     x: Schema.Number,
     y: Schema.Number,
   })),
-  radius: Schema.Option(Schema.Number),
-  frontAngle: Schema.Option(Schema.Number),
+  radius: Schema.UndefinedOr(Schema.Number),
+  frontAngle: Schema.UndefinedOr(Schema.Number),
 })
 
 export interface CameraCoordinateExistenceInfo {
@@ -263,6 +263,21 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       lat: Schema.NumberFromString,
       lng: Schema.NumberFromString,
       bearing: Schema.NumberFromString
+    }))
+  )
+  .add(HttpApiEndpoint.get("testPoint", "/test-point")
+    .addSuccess(Schema.Struct({
+        status: Schema.NonEmptyTrimmedString,
+        points: Schema.Array(ObjRegionInfoSchema),
+      }
+    ))
+    .addError(GenericError, {status: 500})
+    .setUrlParams(Schema.Struct({
+      userId: Schema.NonEmptyTrimmedString,
+      lat: Schema.NumberFromString,
+      lng: Schema.NumberFromString,
+      bearing: Schema.NumberFromString,
+      radius: Schema.NumberFromString,
     }))
   )
   .add(HttpApiEndpoint.get("viewInfo", "/view-info")
