@@ -268,7 +268,8 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
   .add(HttpApiEndpoint.get("testPoint", "/test-point")
     .addSuccess(Schema.Struct({
         status: Schema.NonEmptyTrimmedString,
-        points: Schema.Array(ObjRegionInfoSchema),
+        regions: Schema.Array(ObjRegionInfoSchema),
+        objects: Schema.Array(ObjRegionInfoSchema),
       }
     ))
     .addError(GenericError, {status: 500})
