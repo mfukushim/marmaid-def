@@ -353,9 +353,8 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       lng: Schema.Number,
       bearing: Schema.Number,
       proceed: Schema.Number,
-      targetId: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
-      targets: Schema.UndefinedOr(Schema.Array(Schema.NonEmptyTrimmedString)),
-    }).annotations({examples:[{userId:"1",proceed:1,targetId:undefined,targets:["living"],lat:30,lng:130,bearing:0}]}))
+      target: Schema.String,
+    }).annotations({examples:[{userId:"1",proceed:1,target:"living",lat:30,lng:130,bearing:0}]}))
   )
   .add(HttpApiEndpoint.post("addObject", "/add-object")
     .addSuccess(Schema.Struct({
