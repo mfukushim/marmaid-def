@@ -8,85 +8,10 @@ export type Vec3 = [number, number, number];
 export type Point = [number, number];
 
 
-export const MapId = Schema.Number.pipe(Schema.brand("MapId"))
-export type MapId = typeof MapId.Type
-
-
-class TimezoneSchema extends Schema.Class<TimezoneSchema>("TimezoneSchema")({
-  status: Schema.NonEmptyTrimmedString,
-  timeZoneId: Schema.UndefinedOr(Schema.String)
-}) {
-}
-
-export class MapNotFound extends Schema.TaggedError<MapNotFound>()("MapNotFound", {
-  id: Schema.Number
-}) {
-}
-
 export class GenericError extends Schema.TaggedError<GenericError>()("GenericError", {
   mes: Schema.String
 }) {
 }
-
-export class SearchNearParam extends Schema.Class<SearchNearParam>("SearchNearParam")({
-  maxResultCount: Schema.Number,
-  languageCode: Schema.String,
-  locationRestriction: Schema.Struct({
-    circle: Schema.Struct({
-      radius: Schema.Number,
-      center: Schema.Struct({
-        lat: Schema.Number,
-        lng: Schema.Number
-      })
-    })
-  })
-}) {
-}
-
-export class StreetViewParam extends Schema.Class<StreetViewParam>("StreetViewParam")({
-  size: Schema.String,
-  location: Schema.String,
-  fov: Schema.NumberFromString,
-  heading: Schema.NumberFromString,
-  pitch: Schema.NumberFromString,
-  key: Schema.String,
-  return_error_code: Schema.BooleanFromString
-}) {
-}
-
-export class LocationParam extends Schema.Class<NearbyParam>("NearbyParam")({
-  // maxResultCount: Schema.Number,
-  // languageCode: Schema.String,
-  lat: Schema.Number,  //  緯度での近似
-  lng: Schema.Number, //
-  bearing: Schema.Number, //  北=0,東=90
-  radius: Schema.Number,  //  m単位
-}) {
-
-}
-
-const CamPosSchema = Schema.Literal(
-  'none',
-  'front',
-  'upper',
-  'lower',
-  'left',
-  'right',
-  'upper right',
-  'upper left',
-  'lower right',
-  'lower left')
-
-const CamDistSchema = Schema.Literal(
-  '',
-  'very close',
-  'close',
-  'in distance',
-  'in very far away',
-)
-
-export type CamPos = typeof CamPosSchema.Type
-export type CamDist = typeof CamDistSchema.Type
 
 const LocStatusSchema = Schema.Literal(
   'error',
@@ -115,11 +40,11 @@ export type AddRemoveStatus = typeof AddRemoveStatusSchema.Type
 
 export class ExistenceSchema extends Schema.Class<ExistenceSchema>("ExistenceSchema")({
   id: Schema.String,
-  typeName: Schema.String,
-  uniqueName: Schema.UndefinedOr(Schema.String),
+  // typeName: Schema.String,
+  // uniqueName: Schema.UndefinedOr(Schema.String),
   parentRegionId: Schema.UndefinedOr(Schema.String),
-  hasObject: Schema.Boolean,
-  desc: Schema.String,
+  // hasObject: Schema.Boolean,
+  description: Schema.String,
   dist: Schema.Number,
   radius: Schema.Number,
   camPos: CamPosSchema, //  カメラビュー文言相対位置
@@ -130,10 +55,10 @@ export class ExistenceSchema extends Schema.Class<ExistenceSchema>("ExistenceSch
 
 export class ViewInfoSchema extends Schema.Class<ViewInfoSchema>("ViewInfoSchema")({
   id: Schema.String,
-  typeName: Schema.String,
-  uniqueName: Schema.UndefinedOr(Schema.String),
-  hasObject: Schema.Boolean,
-  desc: Schema.String,
+  // typeName: Schema.String,
+  // uniqueName: Schema.UndefinedOr(Schema.String),
+  // hasObject: Schema.Boolean,
+  description: Schema.String,
   dist: Schema.Number,
   radius: Schema.Number,
   camPos: CamPosSchema, //  カメラビュー文言相対位置
@@ -141,20 +66,14 @@ export class ViewInfoSchema extends Schema.Class<ViewInfoSchema>("ViewInfoSchema
 }) {
 }
 
-export class NearbyParam extends Schema.Class<NearbyParam>("NearbyParam")({
-  userId: Schema.String,
-  nearLocation: LocationParam,
-}) {
-}
-
 
 export const ObjRegionInfoSchema = Schema.Struct({
   id: Schema.String,
-  typeName: Schema.String,
-  uniqueName: Schema.UndefinedOr(Schema.String),
+  // typeName: Schema.String,
+  // uniqueName: Schema.UndefinedOr(Schema.String),
   parentRegionId: Schema.UndefinedOr(Schema.String),
-  hasObject: Schema.Boolean,
-  desc: Schema.String,
+  // hasObject: Schema.Boolean,
+  description: Schema.String,
   //  locationかoffsetで指定 offsetの場合はparentRegionIdが必須
   location: Schema.UndefinedOr(Schema.Struct({
     lat: Schema.Number,
@@ -168,12 +87,6 @@ export const ObjRegionInfoSchema = Schema.Struct({
   frontAngle: Schema.UndefinedOr(Schema.Number),
 })
 
-export interface CameraCoordinateExistenceInfo {
-  target: typeof ObjRegionInfoSchema.Type | typeof ObjRegionInfoSchema.Type;
-  pos2D: Point;
-  pos3D: Vec3,
-}
-
 export const MarmaidTextSearchSchema = Schema.Struct({
   places: MapDef.GmPlacesSchema,
   // regions: Schema.UndefinedOr(Schema.Array(ObjRegionInfoSchema)),
@@ -181,60 +94,7 @@ export const MarmaidTextSearchSchema = Schema.Struct({
 })
 
 
-export class MapsApiGroup extends HttpApiGroup.make("maps")
-  .add(HttpApiEndpoint.get("directions", "/directions")
-    .addSuccess(Schema.Union(
-      MapDef.DirectionsSchema,
-      MapDef.ErrorSchema,
-      MapDef.EmptySchema,
-    ))
-    .setUrlParams(Schema.Struct({
-      origin: Schema.String,
-      destination: Schema.String,
-      mode: Schema.String,
-      key: Schema.String
-    }))
-  )
-  .add(
-    HttpApiEndpoint.get("timezone", "/timezone")
-      .addSuccess(TimezoneSchema)
-      .addError(MapNotFound, {status: 404})
-      .setUrlParams(Schema.Struct({location: Schema.String, timestamp: Schema.String, key: Schema.String}))
-  )
-  .add(
-    HttpApiEndpoint.post("searchText", "/searchText")
-      .addSuccess(Schema.Union(
-        MarmaidTextSearchSchema,
-        MapDef.ErrorSchema,
-        MapDef.EmptySchema,
-      ))
-      .setPayload(Schema.Struct({textQuery: Schema.NonEmptyTrimmedString}))
-  )
-  .add(
-    HttpApiEndpoint.post("searchNearby", "/searchNearby")
-      .addSuccess(Schema.Union(
-        MarmaidTextSearchSchema,
-        MapDef.ErrorSchema,
-        MapDef.EmptySchema,
-      ))
-      .addError(MapNotFound, {status: 404})
-      .setPayload(SearchNearParam)
-  )
-  .add(
-    HttpApiEndpoint.get("metadata", "/metadata")
-      .addSuccess(Schema.Struct({
-        status: Schema.Number,
-      }))
-      .addError(MapNotFound, {status: 404})
-      .setUrlParams(StreetViewParam)
-  )
-  .add(
-    HttpApiEndpoint.get("streetview", "/streetview")
-      .addSuccess(Schema.Uint8Array)
-      .addError(MapNotFound, {status: 404})
-      .setUrlParams(StreetViewParam)
-  ) {
-}
+
 
 export class ViewApiGroup extends HttpApiGroup.make("view")
   .add(HttpApiEndpoint.get("viewPrompt", "/view-prompt")
@@ -268,7 +128,7 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
   .add(HttpApiEndpoint.get("testPoint", "/test-point")
     .addSuccess(Schema.Struct({
         status: Schema.NonEmptyTrimmedString,
-        regions: Schema.Array(ObjRegionInfoSchema),
+        // regions: Schema.Array(ObjRegionInfoSchema),
         objects: Schema.Array(ObjRegionInfoSchema),
       }
     ))
@@ -284,9 +144,9 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
   .add(HttpApiEndpoint.get("viewInfo", "/view-info")
     .addSuccess(Schema.Struct({
         status: Schema.NonEmptyTrimmedString,
-        regionDesc: Schema.String,
-        regions: Schema.Array(ViewInfoSchema),
-        objects: Schema.Array(ViewInfoSchema),
+        enclosingObjects: Schema.Array(ViewInfoSchema),
+        // regions: Schema.Array(ViewInfoSchema),
+        visibleObjects: Schema.Array(ViewInfoSchema),
       }
     ))
     .addError(GenericError, {status: 500})
