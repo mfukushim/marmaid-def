@@ -38,36 +38,36 @@ export type LocStatus = typeof LocStatusSchema.Type
 export type MoveStatus = typeof MoveStatusSchema.Type
 export type AddRemoveStatus = typeof AddRemoveStatusSchema.Type
 
-export class ExistenceSchema extends Schema.Class<ExistenceSchema>("ExistenceSchema")({
+// export class ExistenceSchema extends Schema.Class<ExistenceSchema>("ExistenceSchema")({
+//   id: Schema.String,
+//   // typeName: Schema.String,
+//   // uniqueName: Schema.UndefinedOr(Schema.String),
+//   parentRegionId: Schema.UndefinedOr(Schema.String),
+//   // hasObject: Schema.Boolean,
+//   description: Schema.String,
+//   dist: Schema.Number,
+//   radius: Schema.Number,
+//   camPos: CamPosSchema, //  カメラビュー文言相対位置
+//   pos2d: Schema.Array(Schema.Number), //  カメラ座標上面2d位置
+//   pos3d: Schema.Array(Schema.Number), //  カメラ座標系3d位置
+// }) {
+// }
+
+export class FeatureInfoSchema extends Schema.Class<FeatureInfoSchema>("FeatureInfoSchema")({
   id: Schema.String,
   // typeName: Schema.String,
   // uniqueName: Schema.UndefinedOr(Schema.String),
-  parentRegionId: Schema.UndefinedOr(Schema.String),
   // hasObject: Schema.Boolean,
   description: Schema.String,
   dist: Schema.Number,
   radius: Schema.Number,
-  camPos: CamPosSchema, //  カメラビュー文言相対位置
-  pos2d: Schema.Array(Schema.Number), //  カメラ座標上面2d位置
-  pos3d: Schema.Array(Schema.Number), //  カメラ座標系3d位置
-}) {
-}
-
-export class ViewInfoSchema extends Schema.Class<ViewInfoSchema>("ViewInfoSchema")({
-  id: Schema.String,
-  // typeName: Schema.String,
-  // uniqueName: Schema.UndefinedOr(Schema.String),
-  // hasObject: Schema.Boolean,
-  description: Schema.String,
-  dist: Schema.Number,
-  radius: Schema.Number,
-  camPos: CamPosSchema, //  カメラビュー文言相対位置
-  camDist: CamDistSchema, //  カメラビュー文言相対位置
+  // camPos: CamPosSchema, //  カメラビュー文言相対位置
+  // camDist: CamDistSchema, //  カメラビュー文言相対位置
 }) {
 }
 
 
-export const ObjRegionInfoSchema = Schema.Struct({
+export const EntityInfoSchema = Schema.Struct({
   id: Schema.String,
   // typeName: Schema.String,
   // uniqueName: Schema.UndefinedOr(Schema.String),
@@ -89,8 +89,8 @@ export const ObjRegionInfoSchema = Schema.Struct({
 
 export const MarmaidTextSearchSchema = Schema.Struct({
   places: MapDef.GmPlacesSchema,
-  // regions: Schema.UndefinedOr(Schema.Array(ObjRegionInfoSchema)),
-  objects: Schema.UndefinedOr(Schema.Array(ObjRegionInfoSchema)),
+  // regions: Schema.UndefinedOr(Schema.Array(EntityInfoSchema)),
+  objects: Schema.UndefinedOr(Schema.Array(EntityInfoSchema)),
 })
 
 
@@ -111,25 +111,25 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       bearing: Schema.NumberFromString
     }))
   )
-  .add(HttpApiEndpoint.get("viewPoint", "/view-point")
-    .addSuccess(Schema.Struct({
-        status: Schema.NonEmptyTrimmedString,
-        points: Schema.Array(ExistenceSchema),
-      }
-    ))
-    .addError(GenericError, {status: 500})
-    .setUrlParams(Schema.Struct({
-      userId: Schema.NonEmptyTrimmedString,
-      lat: Schema.NumberFromString,
-      lng: Schema.NumberFromString,
-      bearing: Schema.NumberFromString
-    }))
-  )
+  // .add(HttpApiEndpoint.get("viewPoint", "/view-point")
+  //   .addSuccess(Schema.Struct({
+  //       status: Schema.NonEmptyTrimmedString,
+  //       points: Schema.Array(ExistenceSchema),
+  //     }
+  //   ))
+  //   .addError(GenericError, {status: 500})
+  //   .setUrlParams(Schema.Struct({
+  //     userId: Schema.NonEmptyTrimmedString,
+  //     lat: Schema.NumberFromString,
+  //     lng: Schema.NumberFromString,
+  //     bearing: Schema.NumberFromString
+  //   }))
+  // )
   .add(HttpApiEndpoint.get("testPoint", "/test-point")
     .addSuccess(Schema.Struct({
         status: Schema.NonEmptyTrimmedString,
-        // regions: Schema.Array(ObjRegionInfoSchema),
-        objects: Schema.Array(ObjRegionInfoSchema),
+        // regions: Schema.Array(EntityInfoSchema),
+        entities: Schema.Array(EntityInfoSchema),
       }
     ))
     .addError(GenericError, {status: 500})
@@ -144,9 +144,9 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
   .add(HttpApiEndpoint.get("viewInfo", "/view-info")
     .addSuccess(Schema.Struct({
         status: Schema.NonEmptyTrimmedString,
-        enclosingObjects: Schema.Array(ViewInfoSchema),
-        // regions: Schema.Array(ViewInfoSchema),
-        visibleObjects: Schema.Array(ViewInfoSchema),
+        enclosingEntities: Schema.Array(FeatureInfoSchema),
+        // regions: Schema.Array(FeatureInfoSchema),
+        visibleEntities: Schema.Array(FeatureInfoSchema),
       }
     ))
     .addError(GenericError, {status: 500})
@@ -164,8 +164,8 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
         lng: Schema.Number,
         bearing: Schema.Number,
         regionDesc: Schema.String,
-        excludeRegions: Schema.Array(ViewInfoSchema),
-        reachableObjects: Schema.Array(ViewInfoSchema),
+        excludeEntities: Schema.Array(FeatureInfoSchema),  //  移動可能
+        reachableEntities: Schema.Array(FeatureInfoSchema), //  触る/追加/削除/変化可能
       }
     ))
     .addError(GenericError, {status: 500})
@@ -284,6 +284,6 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
 }
 
 export class MarmaidApi extends HttpApi.make("marmaid")
-  .add(MapsApiGroup)
+  // .add(MapsApiGroup)
   .add(ViewApiGroup) {
 }
