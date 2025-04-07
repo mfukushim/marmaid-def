@@ -2,7 +2,6 @@
 
 import {HttpApi, HttpApiEndpoint, HttpApiGroup} from "@effect/platform"
 import {Schema} from "effect"
-import {MapDef} from "./MapDef.js";
 
 export type Vec3 = [number, number, number];
 export type Point = [number, number];
@@ -38,43 +37,24 @@ export type LocStatus = typeof LocStatusSchema.Type
 export type MoveStatus = typeof MoveStatusSchema.Type
 export type AddRemoveStatus = typeof AddRemoveStatusSchema.Type
 
-// export class ExistenceSchema extends Schema.Class<ExistenceSchema>("ExistenceSchema")({
-//   id: Schema.String,
-//   // typeName: Schema.String,
-//   // uniqueName: Schema.UndefinedOr(Schema.String),
-//   parentRegionId: Schema.UndefinedOr(Schema.String),
-//   // hasObject: Schema.Boolean,
-//   description: Schema.String,
-//   dist: Schema.Number,
-//   radius: Schema.Number,
-//   camPos: CamPosSchema, //  カメラビュー文言相対位置
-//   pos2d: Schema.Array(Schema.Number), //  カメラ座標上面2d位置
-//   pos3d: Schema.Array(Schema.Number), //  カメラ座標系3d位置
-// }) {
-// }
-
+/**
+ * 機能/意味主体情報
+ */
 export class FeatureInfoSchema extends Schema.Class<FeatureInfoSchema>("FeatureInfoSchema")({
   id: Schema.String,
-  // typeName: Schema.String,
-  // uniqueName: Schema.UndefinedOr(Schema.String),
-  // hasObject: Schema.Boolean,
   description: Schema.String,
   dist: Schema.Number,
   radius: Schema.Number,
-  // camPos: CamPosSchema, //  カメラビュー文言相対位置
-  // camDist: CamDistSchema, //  カメラビュー文言相対位置
 }) {
 }
 
-
-export const EntityInfoSchema = Schema.Struct({
+/**
+ * 機能/意味/座標情報
+ */
+export class EntityInfoSchema extends Schema.Class<EntityInfoSchema>("EntityInfoSchema")({
   id: Schema.String,
-  // typeName: Schema.String,
-  // uniqueName: Schema.UndefinedOr(Schema.String),
   parentRegionId: Schema.UndefinedOr(Schema.String),
-  // hasObject: Schema.Boolean,
   description: Schema.String,
-  //  locationかoffsetで指定 offsetの場合はparentRegionIdが必須
   location: Schema.UndefinedOr(Schema.Struct({
     lat: Schema.Number,
     lng: Schema.Number,
@@ -85,15 +65,8 @@ export const EntityInfoSchema = Schema.Struct({
   })),
   radius: Schema.UndefinedOr(Schema.Number),
   frontAngle: Schema.UndefinedOr(Schema.Number),
-})
-
-export const MarmaidTextSearchSchema = Schema.Struct({
-  places: MapDef.GmPlacesSchema,
-  // regions: Schema.UndefinedOr(Schema.Array(EntityInfoSchema)),
-  objects: Schema.UndefinedOr(Schema.Array(EntityInfoSchema)),
-})
-
-
+}) {
+}
 
 
 export class ViewApiGroup extends HttpApiGroup.make("view")
@@ -111,24 +84,9 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       bearing: Schema.NumberFromString
     }))
   )
-  // .add(HttpApiEndpoint.get("viewPoint", "/view-point")
-  //   .addSuccess(Schema.Struct({
-  //       status: Schema.NonEmptyTrimmedString,
-  //       points: Schema.Array(ExistenceSchema),
-  //     }
-  //   ))
-  //   .addError(GenericError, {status: 500})
-  //   .setUrlParams(Schema.Struct({
-  //     userId: Schema.NonEmptyTrimmedString,
-  //     lat: Schema.NumberFromString,
-  //     lng: Schema.NumberFromString,
-  //     bearing: Schema.NumberFromString
-  //   }))
-  // )
-  .add(HttpApiEndpoint.get("testPoint", "/test-point")
+  .add(HttpApiEndpoint.get("testPoint", "/test-point")  //  デバッグ用
     .addSuccess(Schema.Struct({
         status: Schema.NonEmptyTrimmedString,
-        // regions: Schema.Array(EntityInfoSchema),
         entities: Schema.Array(EntityInfoSchema),
       }
     ))
@@ -141,11 +99,10 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       radius: Schema.NumberFromString,
     }))
   )
-  .add(HttpApiEndpoint.get("viewInfo", "/view-info")
+  .add(HttpApiEndpoint.get("viewInfo", "/view-info")  //  視覚情報
     .addSuccess(Schema.Struct({
         status: Schema.NonEmptyTrimmedString,
         enclosingEntities: Schema.Array(FeatureInfoSchema),
-        // regions: Schema.Array(FeatureInfoSchema),
         visibleEntities: Schema.Array(FeatureInfoSchema),
       }
     ))
@@ -157,7 +114,7 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       bearing: Schema.NumberFromString
     }).annotations({examples:[{userId:"1",lat:30,lng:130,bearing:0}]}))
   )
-  .add(HttpApiEndpoint.get("regionMap", "/region-map")
+  .add(HttpApiEndpoint.get("regionMap", "/region-map")  //  移動/操作可能範囲マップ
     .addSuccess(Schema.Struct({
         status: Schema.NonEmptyTrimmedString,
         lat: Schema.Number,
@@ -176,24 +133,25 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       bearing: Schema.NumberFromString
     }).annotations({examples:[{userId:"1",lat:30,lng:130,bearing:0}]}))
   )
-  .add(HttpApiEndpoint.post("checkTarget", "/check-target")
+  .add(HttpApiEndpoint.post("checkTarget", "/check-target") //  存在確認ユーティリティ
     .addSuccess(Schema.Struct({
         status: LocStatusSchema,
-        answer: Schema.String,
-        targetName: Schema.UndefinedOr(Schema.String),
+        answer: Schema.String, // is
+        // targetName: Schema.UndefinedOr(Schema.String),
         targetId: Schema.UndefinedOr(Schema.String),
       }
     ))
     .addError(GenericError, {status: 500})
     .setPayload(Schema.Struct({
       userId: Schema.String,
-      targets: Schema.Array(Schema.NonEmptyTrimmedString),
+      target: Schema.String,
+      // targets: Schema.Array(Schema.NonEmptyTrimmedString),
       lat: Schema.Number,
       lng: Schema.Number,
       bearing: Schema.Number
-    }).annotations({examples:[{userId:"1",targets:["living"],lat:30,lng:130,bearing:0}]}))
+    }).annotations({examples:[{userId:"1",target:"living",lat:30,lng:130,bearing:0}]}))
   )
-  .add(HttpApiEndpoint.post("moveToTarget", "/move-to-target")
+  .add(HttpApiEndpoint.post("moveToTarget", "/move-to-target")  //  移動
     .addSuccess(Schema.Struct({
         status: MoveStatusSchema,
         answer: Schema.String,
@@ -212,23 +170,21 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       lat: Schema.Number,
       lng: Schema.Number,
       bearing: Schema.Number,
-      proceed: Schema.Number,
       target: Schema.String,
-    }).annotations({examples:[{userId:"1",proceed:1,target:"living",lat:30,lng:130,bearing:0}]}))
+    }).annotations({examples:[{userId:"1",target:"living",lat:30,lng:130,bearing:0}]}))
   )
-  .add(HttpApiEndpoint.post("addObject", "/add-object")
+  .add(HttpApiEndpoint.post("addSignPost", "/add-sign-post")  //  マーカー追加
     .addSuccess(Schema.Struct({
         status: AddRemoveStatusSchema,
         answer: Schema.String,
-        // loc: Schema.UndefinedOr(Schema.Struct(
-        //   {
-        //     lat: Schema.Number,
-        //     lng: Schema.Number,
-        //     bearing: Schema.Number,
-        //   }
-        // )),
-        objectId: Schema.UndefinedOr(Schema.String),
-        regionId: Schema.UndefinedOr(Schema.String),
+        loc: Schema.UndefinedOr(Schema.Struct(
+          {
+            lat: Schema.Number,
+            lng: Schema.Number,
+            bearing: Schema.Number,
+          }
+        )),
+        entityId: Schema.UndefinedOr(Schema.String),
       }
     ))
     .addError(GenericError, {status: 500})
@@ -237,17 +193,13 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       lat: Schema.Number,
       lng: Schema.Number,
       bearing: Schema.Number,
-      typeName: Schema.NonEmptyTrimmedString,
-      uniqueName: Schema.UndefinedOr(Schema.String),
-      desc: Schema.NonEmptyTrimmedString,
+      description: Schema.NonEmptyTrimmedString,
       radius: Schema.UndefinedOr(Schema.Number),
-      nearbyTargetId: Schema.UndefinedOr(Schema.String),
-      nearbyTargets: Schema.Array(Schema.String),
+      addTarget: Schema.UndefinedOr(Schema.String),
       expirationEpoch: Schema.UndefinedOr(Schema.Number),
-      position: Schema.UndefinedOr(Schema.String),
     }))
   )
-  .add(HttpApiEndpoint.post("removeObject", "/remove-object")
+  .add(HttpApiEndpoint.post("removeSignPost", "/remove-sign-post")  //  マーカー削除
     .addSuccess(Schema.Struct({
         status: AddRemoveStatusSchema,
         answer: Schema.String,
@@ -259,10 +211,9 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
       lat: Schema.Number,
       lng: Schema.Number,
       bearing: Schema.Number,
-      targetId: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
-      targets: Schema.UndefinedOr(Schema.Array(Schema.NonEmptyTrimmedString)),
+      target: Schema.String,
     })))
-    .add(HttpApiEndpoint.post("changeObject", "/change-object")
+    .add(HttpApiEndpoint.post("updateSignPost", "/update-sign-post")  //  記述の変化、追加削除
       .addSuccess(Schema.Struct({
           status: AddRemoveStatusSchema,
           answer: Schema.String,
@@ -274,16 +225,12 @@ export class ViewApiGroup extends HttpApiGroup.make("view")
         lat: Schema.Number,
         lng: Schema.Number,
         bearing: Schema.Number,
-        targetId: Schema.UndefinedOr(Schema.NonEmptyTrimmedString),
-        targets: Schema.UndefinedOr(Schema.Array(Schema.NonEmptyTrimmedString)),
-        desc: Schema.String,
-        typeName: Schema.UndefinedOr(Schema.String),
-        uniqueName: Schema.UndefinedOr(Schema.String),
+        target: Schema.String,
+        description: Schema.String,
       }))
   ) {
 }
 
 export class MarmaidApi extends HttpApi.make("marmaid")
-  // .add(MapsApiGroup)
   .add(ViewApiGroup) {
 }
