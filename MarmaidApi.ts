@@ -37,6 +37,16 @@ export type LocStatus = typeof LocStatusSchema.Type
 export type MoveStatus = typeof MoveStatusSchema.Type
 export type AddRemoveStatus = typeof AddRemoveStatusSchema.Type
 
+export class LocationParam extends Schema.Class<LocationParam>("LocationParam")({
+  lat: Schema.Number,  //  緯度での近似
+  lng: Schema.Number, //
+  bearing: Schema.Number, //  北=0,東=90
+  radius: Schema.Number,  //  m単位
+}) {
+
+}
+
+
 /**
  * 機能/意味主体情報
  */
