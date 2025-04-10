@@ -73,6 +73,7 @@ export class EntityInfoSchema extends Schema.Class<EntityInfoSchema>("EntityInfo
     x: Schema.Number,
     y: Schema.Number,
   })),
+  dist: Schema.UndefinedOr(Schema.Number),
   radius: Schema.UndefinedOr(Schema.Number),
   frontAngle: Schema.UndefinedOr(Schema.Number),
 }) {
